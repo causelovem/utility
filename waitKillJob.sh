@@ -7,13 +7,15 @@
 function waitJob
 {
     # количество работающих процессов сейчас
-    jobsCount=$(( $(jobs | grep "Running.*$1" | wc -l) + 0))
+    jobsCount=$(( $(jobs | grep "Запущен.*$1" | wc -l) + 0))
+    # jobsCount=$(( $(jobs | grep "Running.*$1" | wc -l) + 0))
 
     # пока их больше чем нужно - спим
     while [ $jobsCount -gt $2 ]
     do
         sleep $3
-        jobsCount=$(($(jobs | grep "Running.*$1" | wc -l) + 0))
+        jobsCount=$(($(jobs | grep "Запущен.*$1" | wc -l) + 0))
+        # jobsCount=$(( $(jobs | grep "Running.*$1" | wc -l) + 0))
     done
 
     echo "$(date +%Y-%m-%d\ %H:%M:%S): Awake, ${jobsCount} jobs working."
@@ -23,17 +25,21 @@ function waitJob
 # функция убивает оставшиеся jobs от текущего процесса
 function killJob
 {
-    echo "$(date +%Y-%m-%d\ %H:%M:%S): Running jobs: $(( $(jobs | grep "Running" | wc -l) + 0))."
+    echo "$(date +%Y-%m-%d\ %H:%M:%S): Запущен jobs: $(( $(jobs | grep "Запущен" | wc -l) + 0))."
+    # echo "$(date +%Y-%m-%d\ %H:%M:%S): Running jobs: $(( $(jobs | grep "Running" | wc -l) + 0))."
 
     # список процессов, которые нужно убить
-    jobsToKill="$(jobs -l | gawk '{ if($2=="Running"){jobsToKill=jobsToKill " " $1} else if($3=="Running"){jobsToKill=jobsToKill " " $2} } END {print jobsToKill}')"
+    jobsToKill="$(jobs -l | gawk '{ if($2=="Запущен"){jobsToKill=jobsToKill " " $1} else if($3=="Запущен"){jobsToKill=jobsToKill " " $2} } END {print jobsToKill}')"
+    # jobsToKill="$(jobs -l | gawk '{ if($2=="Running"){jobsToKill=jobsToKill " " $1} else if($3=="Running"){jobsToKill=jobsToKill " " $2} } END {print jobsToKill}')"
     try=0
 
     # пока список не пустой
     while [[ "${jobsToKill}" != "" ]]
     do
-        echo "ERROR: Some jobs is still running (${jobsToKill})."
-        jobs | grep Running
+        # echo "ERROR: Some jobs is still Запущен (${jobsToKill})."
+        echo "ERROR: Some jobs is still Running (${jobsToKill})."
+        # jobs | grep Запущен
+        # jobs | grep Running
 
         try=$((${try} + 1))
 
@@ -51,9 +57,11 @@ function killJob
         fi
 
         # список процессов, которые нужно убить
-        jobsToKill="$(jobs -l | gawk '{ if($2=="Running"){jobsToKill=jobsToKill " " $1} else if($3=="Running"){jobsToKill=jobsToKill " " $2} } END {print jobsToKill}')"
+        jobsToKill="$(jobs -l | gawk '{ if($2=="Запущен"){jobsToKill=jobsToKill " " $1} else if($3=="Запущен"){jobsToKill=jobsToKill " " $2} } END {print jobsToKill}')"
+        # jobsToKill="$(jobs -l | gawk '{ if($2=="Running"){jobsToKill=jobsToKill " " $1} else if($3=="Running"){jobsToKill=jobsToKill " " $2} } END {print jobsToKill}')"
 
     done
 
-    echo "$(date +%Y-%m-%d\ %H:%M:%S): Running jobs: $(( $(jobs | grep "Running" | wc -l) + 0))."
+    echo "$(date +%Y-%m-%d\ %H:%M:%S): Запущен jobs: $(( $(jobs | grep "Запущен" | wc -l) + 0))."
+    # echo "$(date +%Y-%m-%d\ %H:%M:%S): Running jobs: $(( $(jobs | grep "Running" | wc -l) + 0))."
 }
